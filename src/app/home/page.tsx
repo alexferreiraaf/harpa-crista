@@ -98,6 +98,7 @@ export default function HomePage() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [verse, setVerse] = useState<VerseOfTheDay | null>(null);
   const [loadingVerse, setLoadingVerse] = useState(true);
+  const [verseError, setVerseError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -114,6 +115,7 @@ export default function HomePage() {
       } catch (error) {
         console.error('Error fetching verse of the day:', error);
         setVerse(null);
+        setVerseError(true);
       } finally {
         setLoadingVerse(false);
       }
@@ -200,7 +202,7 @@ export default function HomePage() {
 
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto space-y-8">
-          <VerseOfTheDayCard verse={verse} loading={loadingVerse} />
+          {!verseError && <VerseOfTheDayCard verse={verse} loading={loadingVerse} />}
           <NavigationButtons />
         </div>
       </main>
