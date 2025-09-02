@@ -4,7 +4,6 @@ import { getHymnById } from '@/lib/hymns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import HymnPlayer from './_components/hymn-player';
-import LyricAnalysis from './_components/lyric-analysis';
 
 export default async function HymnDetailPage({ params }: { params: { id: string } }) {
   const hymn = await getHymnById(params.id);
@@ -46,7 +45,6 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
           <div className="lg:col-span-2 space-y-6">
             <HymnPlayer title="Cantado" audioUrl={hymn.audioUrl} />
             <HymnPlayer title="Instrumental" audioUrl={hymn.instrumentalUrl} />
-            <LyricAnalysis hymnTitle={hymn.title} lyrics={hymn.lyrics} />
           </div>
         </div>
       </main>
