@@ -13,7 +13,7 @@ const VerseOfTheDaySchema = z.object({
 });
 export type VerseOfTheDay = z.infer<typeof VerseOfTheDaySchema>;
 
-// Lista de versículos inspiradores para escolher aleatoriamente
+// Lista de versículos inspiradores
 const verses = [
     "John+3:16", "Romans+8:28", "Philippians+4:13", "Proverbs+3:5-6", "Jeremiah+29:11",
     "Isaiah+41:10", "Psalm+23:1", "1+Corinthians+10:13", "Romans+12:2", "Galatians+5:22-23"
@@ -22,11 +22,17 @@ const verses = [
 
 export async function getVerseOfTheDay(): Promise<VerseOfTheDay> {
   try {
-    // Escolhe um versículo aleatório da lista
-    const randomVerseReference = verses[Math.floor(Math.random() * verses.length)];
+    // Usa o dia do ano para garantir que o mesmo versículo seja exibido por 24h
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now.getTime() - start.getTime();
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    const verseIndex = dayOfYear % verses.length;
+    const dailyVerseReference = verses[verseIndex];
     
     // Chama a API pública
-    const response = await fetch(`https://bible-api.com/${randomVerseReference}?translation=almeida`);
+    const response = await fetch(`https://bible-api.com/${dailyVerseReference}?translation=almeida`);
     
     if (!response.ok) {
         throw new Error(`API call failed with status: ${response.status}`);
