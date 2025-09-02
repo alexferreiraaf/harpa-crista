@@ -6,28 +6,39 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
-export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
+export default function HymnPlayer({ title, audioUrl }: { title: string, audioUrl: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [canPlay, setCanPlay] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      setIsPlaying(false);
-    }
+    return () => {
+      if (audio) {
+        audio.pause();
+      }
+    };
   }, []);
   
-  const canPlay = audioUrl && audioUrl.length > 0;
-
   useEffect(() => {
-    if (audioRef.current && canPlay) {
-      audioRef.current.src = audioUrl;
-      audioRef.current.load();
+    setCanPlay(!!audioUrl);
+    if (audioRef.current) {
+        if(audioUrl) {
+            audioRef.current.src = audioUrl;
+            audioRef.current.load();
+        } else {
+            audioRef.current.removeAttribute('src');
+            audioRef.current.load();
+        }
     }
-  }, [audioUrl, canPlay]);
+    // Reset state when url changes
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+
+  }, [audioUrl]);
 
   const togglePlayPause = () => {
     if (!canPlay) return;
@@ -36,9 +47,15 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
         if (isPlaying) {
           audio.pause();
         } else {
+          // Pause all other audio elements on the page
+          document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== audio) {
+              otherAudio.pause();
+            }
+          });
           audio.play().catch(error => console.error("Playback failed:", error));
         }
-        setIsPlaying(!isPlaying);
+        // The onPlay/onPause events will handle setIsPlaying
     }
   };
 
@@ -67,7 +84,7 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
   return (
     <Card className="shadow-lg bg-card">
       <CardHeader>
-        <CardTitle>Ouvir Hino</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <audio
@@ -97,7 +114,7 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
         </div>
          {!canPlay && (
           <p className="text-sm text-muted-foreground text-center mt-2">
-            Nenhum áudio disponível para este hino.
+            Nenhum áudio disponível.
           </p>
         )}
       </CardContent>

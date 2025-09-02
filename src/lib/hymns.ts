@@ -7,6 +7,7 @@ export interface Hymn {
   title: string;
   lyrics: string[];
   audioUrl: string;
+  instrumentalUrl: string;
 }
 
 export const getHymnById = async (id: string): Promise<Hymn | undefined> => {
@@ -24,6 +25,7 @@ export const getHymnById = async (id: string): Promise<Hymn | undefined> => {
         title: data.title,
         lyrics: lyrics,
         audioUrl: data.audioUrl || '',
+        instrumentalUrl: data.instrumentalUrl || '',
       };
     } else {
       console.log('No such document!');
@@ -51,6 +53,7 @@ export const getAllHymns = async (): Promise<Hymn[]> => {
             title: data.title,
             lyrics: lyrics,
             audioUrl: data.audioUrl || '',
+            instrumentalUrl: data.instrumentalUrl || '',
         });
     });
     return hymns;
