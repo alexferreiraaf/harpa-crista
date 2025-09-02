@@ -1,8 +1,12 @@
-import { getAllHymns } from '@/lib/hymns';
+"use client";
+
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { getAllHymns, type Hymn } from '@/lib/hymns';
 import HymnList from './_components/hymn-list';
-import { UserCircle, LogIn, User } from 'lucide-react';
+import { User, LogOut, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Suspense } from 'react';
 import { Logo } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
@@ -13,10 +17,44 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
+import { observeUser, signOutUser } from '@/lib/auth';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-export default async function HomePage() {
-  const hymns = await getAllHymns();
+export default function HomePage() {
+  const [hymns, setHymns] = useState<Hymn[]>([]);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = observeUser((user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    async function fetchHymns() {
+      const fetchedHymns = await getAllHymns();
+      setHymns(fetchedHymns);
+    }
+    fetchHymns();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOutUser();
+    router.push('/');
+  };
+  
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -31,27 +69,41 @@ export default async function HomePage() {
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <UserCircle className="h-6 w-6" />
-                <span className="sr-only">Abrir menu do usuário</span>
+              <Button variant="ghost" className="flex items-center gap-2 h-10 w-auto px-2">
+                 <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+                </Avatar>
+                {user && (
+                    <div className="text-left hidden md:flex flex-col">
+                        <span className="text-xs font-semibold leading-tight">{user.displayName || 'Usuário'}</span>
+                    </div>
+                )}
+                 <span className="sr-only">Abrir menu do usuário</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <Link href="/profile" passHref>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <Link href="/" passHref>
-                <DropdownMenuItem>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  <span>Login</span>
-                </DropdownMenuItem>
-              </Link>
+              {user ? (
+                <>
+                  <DropdownMenuLabel>{user.displayName || 'Minha Conta'}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <Link href="/" passHref>
+                    <DropdownMenuItem>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      <span>Login</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -59,7 +111,7 @@ export default async function HomePage() {
 
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
-          <Suspense>
+          <Suspense fallback={<p>Carregando hinos...</p>}>
             <HymnList hymns={hymns} />
           </Suspense>
         </div>
