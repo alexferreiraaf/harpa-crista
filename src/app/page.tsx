@@ -13,18 +13,76 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GoogleIcon, Logo } from "@/components/icons";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { signInWithEmail, signInWithGoogle } from "@/lib/auth";
+
+const formSchema = z.object({
+  email: z.string().email({ message: "Por favor, insira um email válido." }),
+  password: z.string().min(1, { message: "A senha é obrigatória." }),
+});
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   const handleAnonymousLogin = () => {
     router.push("/home");
   };
   
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push("/home");
+  const handleLogin = async (values: z.infer<typeof formSchema>) => {
+    const { email, password } = values;
+    const { error } = await signInWithEmail(email, password);
+
+    if (error) {
+      toast({
+        title: "Erro no Login",
+        description: "Email ou senha inválidos. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Login bem-sucedido!",
+        description: "Você será redirecionado para a página inicial.",
+      });
+      router.push("/home");
+    }
   };
+  
+  const handleGoogleLogin = async () => {
+    const { error } = await signInWithGoogle();
+    if (error) {
+      toast({
+        title: "Erro no Login com Google",
+        description: "Não foi possível fazer login com o Google. Tente novamente.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Login bem-sucedido!",
+        description: "Você será redirecionado para a página inicial.",
+      });
+      router.push("/home");
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4 sm:p-6 md:p-8 animate-fade-in">
@@ -42,19 +100,39 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="seu@email.com" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                Entrar
-              </Button>
-            </form>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="seu@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={form.formState.isSubmitting}>
+                   {form.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
+                </Button>
+              </form>
+            </Form>
             <div className="mt-4 relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -66,7 +144,7 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="mt-4 grid grid-cols-1 gap-3">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleGoogleLogin}>
                 <GoogleIcon className="mr-2 h-4 w-4" />
                 Google
               </Button>
