@@ -35,15 +35,21 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
-      viewBox="0 0 100 100"
+      viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="4"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M52.5,23.5 L38.3,28.1 L38.3,80.5 L42.5,79 L42.5,33.4 L46.7,31.9 L46.7,77.5 L50.8,76 L50.8,30.4 L55,28.9 L55,74.6 L59.2,73.1 L59.2,27.5 L63.3,26 L63.3,71.6 L67.5,70.1 L67.5,24.5 L52.5,23.5 Z M71.7,21.9 L71.7,68.6 L91.7,63.1 L91.7,14.9 L71.7,21.9 Z M75.8,40.8 L87.5,37.8 M75.8,47.2 L87.5,44.2 M75.8,29.1 L87.5,26.1 M75.8,35 L87.5,32 M80.4,53.4 L80.4,59.2 M85.4,53.4 L85.4,59.2" />
+      <path d="M17 18H7a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4Z" />
+      <path d="M7 18v-4" />
+      <path d="M9 14V6" />
+      <path d="M11 14V6" />
+      <path d="M13 14V6" />
+      <path d="M15 14V6" />
+      <path d="M17 14V6" />
     </svg>
   );
 }

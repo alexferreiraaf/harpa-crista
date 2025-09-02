@@ -23,10 +23,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <meta name="application-name" content="Harpa Cristã" />
+        <meta name="application-name" content="Harpa Cristã AD Belém Ourinhos" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Harpa Cristã" />
+        <meta name="apple-mobile-web-app-title" content="Harpa Cristã AD Belém Ourinhos" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#00BFFF" />
