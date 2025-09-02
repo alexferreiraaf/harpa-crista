@@ -44,7 +44,7 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
 
           <div className="lg:col-span-2 space-y-6">
             <HymnPlayer title="Cantado" audioUrl={hymn.audioUrl} />
-            <HymnPlayer title="Instrumental" audioUrl={hymymn.instrumentalUrl} />
+            <HymnPlayer title="Instrumental" audioUrl={hymn.instrumentalUrl} />
           </div>
         </div>
       </main>
