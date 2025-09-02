@@ -8,7 +8,8 @@ import {
   GoogleAuthProvider,
   updateProfile,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
+  signInAnonymously
 } from "firebase/auth";
 
 setPersistence(auth, browserLocalPersistence);
@@ -39,6 +40,16 @@ export async function signInWithGoogle() {
     return { user: result.user, error: null };
   } catch (error) {
     console.error("Google Sign-In Error:", error);
+    return { user: null, error };
+  }
+}
+
+export async function signInAsGuest() {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    return { user: userCredential.user, error: null };
+  } catch (error) {
+    console.error("Anonymous Sign-In Error:", error);
     return { user: null, error };
   }
 }

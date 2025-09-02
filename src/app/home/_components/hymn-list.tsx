@@ -52,7 +52,7 @@ export default function HymnList({
     e.preventDefault(); // Impede a navegação ao clicar no ícone
     e.stopPropagation();
 
-    if (!user) {
+    if (!user || user.isAnonymous) {
       toast({
         title: 'Faça login para favoritar',
         description: 'Você precisa estar logado para salvar seus hinos favoritos.',

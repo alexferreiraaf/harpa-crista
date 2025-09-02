@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmail, signInWithGoogle } from "@/lib/auth";
+import { signInWithEmail, signInWithGoogle, signInAsGuest } from "@/lib/auth";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Por favor, insira um email válido." }),
@@ -44,8 +44,17 @@ export default function LoginPage() {
     },
   });
 
-  const handleAnonymousLogin = () => {
-    router.push("/home");
+  const handleAnonymousLogin = async () => {
+    const { error } = await signInAsGuest();
+    if (error) {
+       toast({
+        title: "Erro",
+        description: "Não foi possível continuar como anônimo. Tente novamente.",
+        variant: "destructive",
+      });
+    } else {
+      router.push("/home");
+    }
   };
   
   const handleLogin = async (values: z.infer<typeof formSchema>) => {
