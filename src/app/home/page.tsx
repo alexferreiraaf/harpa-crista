@@ -4,6 +4,7 @@ import { UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import { Logo } from '@/components/icons';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function HomePage() {
   const hymns = getAllHymns();
@@ -17,9 +18,12 @@ export default function HomePage() {
             Harpa Cristã
           </h1>
         </div>
-        <Button variant="ghost" size="icon">
-          <UserCircle className="h-6 w-6" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon">
+            <UserCircle className="h-6 w-6" />
+          </Button>
+        </div>
       </header>
 
       <main className="flex-1 p-4 sm:p-6">
