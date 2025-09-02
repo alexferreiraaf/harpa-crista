@@ -1,8 +1,9 @@
 import { getAllHymns } from '@/lib/hymns';
 import HymnList from './_components/hymn-list';
-import { Music, UserCircle } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
+import { Logo } from '@/components/icons';
 
 export default function HomePage() {
   const hymns = getAllHymns();
@@ -11,7 +12,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-3 bg-background/80 backdrop-blur-sm border-b">
         <div className="flex items-center gap-2">
-          <Music className="h-6 w-6 text-primary" />
+          <Logo className="h-7 w-7 text-primary" />
           <h1 className="text-xl font-bold font-headline text-foreground">
             Harpa Cristã
           </h1>
