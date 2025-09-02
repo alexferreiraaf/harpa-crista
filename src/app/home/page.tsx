@@ -1,10 +1,19 @@
 import { getAllHymns } from '@/lib/hymns';
 import HymnList from './_components/hymn-list';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, LogIn, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import { Logo } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 export default async function HomePage() {
   const hymns = await getAllHymns();
@@ -20,9 +29,31 @@ export default async function HomePage() {
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button variant="ghost" size="icon">
-            <UserCircle className="h-6 w-6" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <UserCircle className="h-6 w-6" />
+                <span className="sr-only">Abrir menu do usuário</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href="/profile" passHref>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
+              <Link href="/" passHref>
+                <DropdownMenuItem>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  <span>Login</span>
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
