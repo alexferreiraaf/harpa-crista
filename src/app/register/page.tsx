@@ -14,14 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GoogleIcon, Logo } from "@/components/icons";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
 
-  const handleAnonymousLogin = () => {
-    router.push("/home");
-  };
-  
-  const handleLogin = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     router.push("/home");
   };
@@ -30,19 +26,21 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-background p-4 animate-fade-in">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-6">
-          <Logo className="h-16 w-16 text-primary" />
+           <Logo className="h-16 w-16 text-primary" />
         </div>
         <Card className="shadow-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-headline">
-              Harpa Cristã AD Belém Ourinhos
-            </CardTitle>
+            <CardTitle className="text-3xl font-headline">Criar uma conta</CardTitle>
             <CardDescription>
-              Faça login para continuar
+              Insira seus dados para se cadastrar
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input id="name" type="text" placeholder="Seu Nome" required />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="seu@email.com" required />
@@ -52,7 +50,7 @@ export default function LoginPage() {
                 <Input id="password" type="password" required />
               </div>
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                Entrar
+                Cadastrar
               </Button>
             </form>
             <div className="mt-4 relative">
@@ -61,7 +59,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  Ou continue com
+                  Ou cadastre-se com
                 </span>
               </div>
             </div>
@@ -71,15 +69,10 @@ export default function LoginPage() {
                 Google
               </Button>
             </div>
-            <div className="mt-6 text-center text-sm">
-              <Button variant="link" onClick={handleAnonymousLogin} className="text-primary">
-                Continuar como anônimo
-              </Button>
-            </div>
-            <div className="mt-2 text-center text-sm">
-              Não tem uma conta?{" "}
-              <Link href="/register" className="underline text-primary">
-                Cadastre-se
+            <div className="mt-4 text-center text-sm">
+              Já tem uma conta?{" "}
+              <Link href="/" className="underline text-primary">
+                Faça login
               </Link>
             </div>
           </CardContent>
