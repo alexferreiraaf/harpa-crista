@@ -7,7 +7,11 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   updateProfile,
+  setPersistence,
+  browserLocalPersistence
 } from "firebase/auth";
+
+setPersistence(auth, browserLocalPersistence);
 
 export async function signUpWithEmail(email: string, password: string, displayName: string) {
   try {
@@ -34,6 +38,20 @@ export async function signInWithGoogle() {
     const result = await signInWithPopup(auth, provider);
     return { user: result.user, error: null };
   } catch (error) {
+    console.error("Google Sign-In Error:", error);
     return { user: null, error };
+  }
+}
+
+export function observeUser(callback: (user: any) => void) {
+  return auth.onAuthStateChanged(callback);
+}
+
+export async function signOutUser() {
+  try {
+    await auth.signOut();
+    return { error: null };
+  } catch (error) {
+    return { error };
   }
 }
