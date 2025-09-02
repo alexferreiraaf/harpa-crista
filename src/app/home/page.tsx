@@ -78,7 +78,7 @@ export default function HomePage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 h-10 w-auto px-2">
                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                    <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
                     <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
                 </Avatar>
                 {user && (
