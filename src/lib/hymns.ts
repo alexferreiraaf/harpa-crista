@@ -32,7 +32,7 @@ export const hymns: Hymn[] = [
       "Dá-nos poder e alegria,",
       "E o Teu divino amor.",
     ],
-    audioUrl: "/audio/placeholder.mp3",
+    audioUrl: "",
   },
   {
     id: "15",
@@ -60,7 +60,7 @@ export const hymns: Hymn[] = [
       "Apressado fugi, em Jesus me escondi,",
       "E abrigo seguro nEle achei.",
     ],
-    audioUrl: "/audio/placeholder.mp3",
+    audioUrl: "",
   },
   {
     id: "545",
@@ -83,7 +83,7 @@ export const hymns: Hymn[] = [
         "Sem medo, então, terei vitória:",
         "Verei na glória o meu Jesus que vivo está.",
     ],
-    audioUrl: "/audio/placeholder.mp3",
+    audioUrl: "",
   }
 ];
 
