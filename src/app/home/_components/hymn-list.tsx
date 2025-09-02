@@ -30,19 +30,19 @@ export default function HymnList({ hymns }: { hymns: Hymn[] }) {
 
   return (
     <>
-      <div className="relative mb-6">
+      <div className="relative mb-4 md:mb-6">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="text"
           placeholder="Pesquisar hino por nome ou número..."
-          className="w-full pl-12 h-14 text-lg rounded-full shadow-lg border-2 border-transparent focus-visible:ring-accent focus-visible:border-accent"
+          className="w-full pl-12 h-12 md:h-14 text-base md:text-lg rounded-full shadow-lg border-2 border-transparent focus-visible:ring-accent focus-visible:border-accent"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <ScrollArea className="h-[calc(100vh-14rem)] rounded-lg">
-        <div className="space-y-2">
+      <ScrollArea className="h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)] rounded-lg">
+        <div className="space-y-2 pr-2">
           {filteredHymns.length > 0 ? (
             filteredHymns.map((hymn, index) => (
               <Link href={`/hymn/${hymn.id}`} key={hymn.id} passHref>
@@ -50,8 +50,8 @@ export default function HymnList({ hymns }: { hymns: Hymn[] }) {
                   className="hover:bg-accent/20 transition-colors duration-300 cursor-pointer animate-fade-in"
                   style={{ animationDelay: `${index * 25}ms`, animationFillMode: 'both' }}
                 >
-                  <CardContent className="flex items-center gap-4 p-4">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary font-bold text-lg">
+                  <CardContent className="flex items-center gap-4 p-3 md:p-4">
+                    <div className="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 text-primary font-bold text-base md:text-lg shrink-0">
                       {hymn.number}
                     </div>
                     <div>

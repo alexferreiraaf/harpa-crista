@@ -23,14 +23,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4 animate-fade-in">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4 sm:p-6 md:p-8 animate-fade-in">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-6">
            <Logo className="h-16 w-16 text-primary" />
         </div>
         <Card className="shadow-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-headline">Criar uma conta</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl font-headline">Criar uma conta</CardTitle>
             <CardDescription>
               Insira seus dados para se cadastrar
             </CardDescription>
