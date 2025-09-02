@@ -40,7 +40,7 @@ function VerseOfTheDayCard({
     <Card className="bg-primary/5 border-primary/20 shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-primary">
-          <Sparkles className="h-6 w-6" />
+          <BookOpen className="h-6 w-6" />
           <span>Versículo do Dia</span>
         </CardTitle>
       </CardHeader>
