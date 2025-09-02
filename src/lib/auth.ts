@@ -4,7 +4,7 @@ import { auth } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect, // Alterado de signInWithPopup
   GoogleAuthProvider,
   updateProfile,
   setPersistence,
@@ -36,8 +36,12 @@ export async function signInWithEmail(email: string, password: string) {
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
-    return { user: result.user, error: null };
+    // A função signInWithRedirect não retorna um resultado diretamente.
+    // O resultado é obtido após o redirecionamento.
+    await signInWithRedirect(auth, provider);
+    // Como a página será recarregada, o resultado será processado pelo onAuthStateChanged
+    // que já temos observando o estado do usuário. Por isso, não precisamos retornar nada aqui.
+    return { user: null, error: null }; 
   } catch (error) {
     console.error("Google Sign-In Error:", error);
     return { user: null, error };
