@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export interface Hymn {
   id: string;
@@ -60,5 +60,37 @@ export const getAllHymns = async (): Promise<Hymn[]> => {
   } catch (error) {
       console.error("Error fetching hymns: ", error);
       return [];
+  }
+};
+
+export const getFavoriteHymns = async (userId: string): Promise<string[]> => {
+  if (!userId) return [];
+  try {
+    const favoritesCollection = collection(db, 'users', userId, 'favorites');
+    const querySnapshot = await getDocs(favoritesCollection);
+    return querySnapshot.docs.map(doc => doc.id);
+  } catch (error) {
+    console.error("Error fetching favorite hymns: ", error);
+    return [];
+  }
+};
+
+export const addFavoriteHymn = async (userId: string, hymnId: string) => {
+  if (!userId || !hymnId) return;
+  try {
+    const favoriteRef = doc(db, 'users', userId, 'favorites', hymnId);
+    await setDoc(favoriteRef, { favoritedAt: new Date() });
+  } catch (error) {
+    console.error("Error adding favorite hymn: ", error);
+  }
+};
+
+export const removeFavoriteHymn = async (userId: string, hymnId: string) => {
+  if (!userId || !hymnId) return;
+  try {
+    const favoriteRef = doc(db, 'users', userId, 'favorites', hymnId);
+    await deleteDoc(favoriteRef);
+  } catch (error) {
+    console.error("Error removing favorite hymn: ", error);
   }
 };

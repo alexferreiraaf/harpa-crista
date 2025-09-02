@@ -7,15 +7,35 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Hymn } from '@/lib/hymns';
-import { Search } from 'lucide-react';
+import { Search, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { addFavoriteHymn, removeFavoriteHymn } from '@/lib/hymns';
+import { useToast } from '@/hooks/use-toast';
 
-export default function HymnList({ hymns }: { hymns: Hymn[] }) {
+
+export default function HymnList({ 
+  hymns,
+  user,
+  favoriteHymnIds: initialFavoriteHymnIds = [],
+}: { 
+  hymns: Hymn[];
+  user: FirebaseUser | null;
+  favoriteHymnIds?: string[];
+}) {
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [favoriteHymnIds, setFavoriteHymnIds] = useState(new Set(initialFavoriteHymnIds));
   
   useEffect(() => {
     setSearchTerm(searchParams.get('q') || '');
   }, [searchParams]);
+
+  useEffect(() => {
+    setFavoriteHymnIds(new Set(initialFavoriteHymnIds));
+  }, [initialFavoriteHymnIds]);
+
 
   const filteredHymns = useMemo(() => {
     if (!searchTerm) {
@@ -27,6 +47,31 @@ export default function HymnList({ hymns }: { hymns: Hymn[] }) {
         hymn.number.toString().includes(searchTerm)
     );
   }, [searchTerm, hymns]);
+  
+  const handleFavoriteClick = async (e: React.MouseEvent, hymnId: string) => {
+    e.preventDefault(); // Impede a navegação ao clicar no ícone
+    e.stopPropagation();
+
+    if (!user) {
+      toast({
+        title: 'Faça login para favoritar',
+        description: 'Você precisa estar logado para salvar seus hinos favoritos.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const newFavoriteIds = new Set(favoriteHymnIds);
+    if (favoriteHymnIds.has(hymnId)) {
+      await removeFavoriteHymn(user.uid, hymnId);
+      newFavoriteIds.delete(hymnId);
+    } else {
+      await addFavoriteHymn(user.uid, hymnId);
+      newFavoriteIds.add(hymnId);
+    }
+    setFavoriteHymnIds(newFavoriteIds);
+  };
+
 
   return (
     <>
@@ -54,9 +99,16 @@ export default function HymnList({ hymns }: { hymns: Hymn[] }) {
                     <div className="flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 text-primary font-bold text-base md:text-lg shrink-0">
                       {hymn.number}
                     </div>
-                    <div>
+                    <div className="flex-grow">
                       <p className="font-semibold text-foreground text-base md:text-lg">{hymn.title}</p>
                     </div>
+                     <button
+                        onClick={(e) => handleFavoriteClick(e, hymn.id)}
+                        className="p-2 rounded-full hover:bg-yellow-400/20 text-muted-foreground hover:text-yellow-500 transition-colors"
+                        aria-label={favoriteHymnIds.has(hymn.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                      >
+                        <Star className={cn("h-6 w-6", favoriteHymnIds.has(hymn.id) && "fill-yellow-500 text-yellow-500")} />
+                      </button>
                   </CardContent>
                 </Card>
               </Link>

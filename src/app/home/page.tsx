@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getAllHymns, type Hymn } from '@/lib/hymns';
+import { getAllHymns, type Hymn, getFavoriteHymns } from '@/lib/hymns';
 import HymnList from './_components/hymn-list';
 import { User, LogOut, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 export default function HomePage() {
   const [hymns, setHymns] = useState<Hymn[]>([]);
   const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [favoriteHymnIds, setFavoriteHymnIds] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = observeUser((user) => {
+    const unsubscribe = observeUser(async (user) => {
       setUser(user);
+      if (user) {
+        const favs = await getFavoriteHymns(user.uid);
+        setFavoriteHymnIds(favs);
+      } else {
+        setFavoriteHymnIds([]);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -112,7 +119,7 @@ export default function HomePage() {
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto">
           <Suspense fallback={<p>Carregando hinos...</p>}>
-            <HymnList hymns={hymns} />
+            <HymnList hymns={hymns} user={user} favoriteHymnIds={favoriteHymnIds} />
           </Suspense>
         </div>
       </main>
