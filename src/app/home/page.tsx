@@ -6,8 +6,8 @@ import { Suspense } from 'react';
 import { Logo } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 
-export default function HomePage() {
-  const hymns = getAllHymns();
+export default async function HomePage() {
+  const hymns = await getAllHymns();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

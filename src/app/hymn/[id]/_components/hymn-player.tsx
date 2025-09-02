@@ -10,7 +10,7 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -22,14 +22,24 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
   
   const canPlay = audioUrl && audioUrl.length > 0;
 
+  useEffect(() => {
+    if (audioRef.current && canPlay) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.load();
+    }
+  }, [audioUrl, canPlay]);
+
   const togglePlayPause = () => {
     if (!canPlay) return;
-    if (isPlaying) {
-      audioRef.current?.pause();
-    } else {
-      audioRef.current?.play().catch(error => console.error("Playback failed:", error));
+    const audio = audioRef.current;
+    if (audio) {
+        if (isPlaying) {
+          audio.pause();
+        } else {
+          audio.play().catch(error => console.error("Playback failed:", error));
+        }
+        setIsPlaying(!isPlaying);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleTimeUpdate = () => {
@@ -60,15 +70,14 @@ export default function HymnPlayer({ audioUrl }: { audioUrl: string }) {
         <CardTitle>Ouvir Hino</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        {canPlay && <audio
+        <audio
           ref={audioRef}
-          src={audioUrl}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={() => setIsPlaying(false)}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-        />}
+        />
         <div className="w-full flex items-center justify-center gap-4">
             <Button onClick={togglePlayPause} size="lg" className="rounded-full w-16 h-16 bg-primary hover:bg-primary/90 shadow-lg" disabled={!canPlay}>
               {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}

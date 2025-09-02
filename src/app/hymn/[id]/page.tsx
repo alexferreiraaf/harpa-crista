@@ -6,8 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import HymnPlayer from './_components/hymn-player';
 import LyricAnalysis from './_components/lyric-analysis';
 
-export default function HymnDetailPage({ params }: { params: { id: string } }) {
-  const hymn = getHymnById(params.id);
+export default async function HymnDetailPage({ params }: { params: { id: string } }) {
+  const hymn = await getHymnById(params.id);
 
   if (!hymn) {
     notFound();
