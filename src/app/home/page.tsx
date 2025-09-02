@@ -1,14 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getAllHymns, type Hymn, getFavoriteHymns } from '@/lib/hymns';
-import HymnList from './_components/hymn-list';
-import { User, LogOut, LogIn } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  BookOpen,
+  Heart,
+  LogIn,
+  LogOut,
+  Sparkles,
+  User as UserIcon,
+} from 'lucide-react';
+import { User as FirebaseUser } from 'firebase/auth';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Logo } from '@/components/icons';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,42 +24,108 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logo } from '@/components/icons';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { observeUser, signOutUser } from '@/lib/auth';
-import type { User as FirebaseUser } from 'firebase/auth';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getVerseOfTheDay, VerseOfTheDay } from '@/ai/flows/verse-of-the-day';
+
+function VerseOfTheDayCard({
+  verse,
+  loading,
+}: {
+  verse: VerseOfTheDay | null;
+  loading: boolean;
+}) {
+  return (
+    <Card className="bg-primary/5 border-primary/20 shadow-lg">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-primary">
+          <Sparkles className="h-6 w-6" />
+          <span>Versículo do Dia</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="space-y-2">
+            <p className="animate-pulse bg-muted-foreground/20 rounded-md h-6 w-3/4"></p>
+            <p className="animate-pulse bg-muted-foreground/20 rounded-md h-5 w-1/4"></p>
+          </div>
+        ) : verse ? (
+          <blockquote className="space-y-2">
+            <p className="text-lg font-medium text-foreground">
+              &ldquo;{verse.text}&rdquo;
+            </p>
+            <cite className="block text-right text-muted-foreground not-italic">
+              &mdash; {verse.reference}
+            </cite>
+          </blockquote>
+        ) : (
+          <p className="text-muted-foreground">
+            Não foi possível carregar o versículo do dia.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NavigationButtons() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Link href="/hymns" passHref>
+        <Button
+          variant="outline"
+          className="w-full h-24 text-lg flex-col gap-2"
+        >
+          <BookOpen className="h-8 w-8" />
+          <span>Todos os Hinos</span>
+        </Button>
+      </Link>
+      <Link href="/favorites" passHref>
+        <Button
+          variant="outline"
+          className="w-full h-24 text-lg flex-col gap-2"
+        >
+          <Heart className="h-8 w-8" />
+          <span>Hinos Favoritos</span>
+        </Button>
+      </Link>
+    </div>
+  );
+}
 
 export default function HomePage() {
-  const [hymns, setHymns] = useState<Hymn[]>([]);
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [favoriteHymnIds, setFavoriteHymnIds] = useState<string[]>([]);
+  const [verse, setVerse] = useState<VerseOfTheDay | null>(null);
+  const [loadingVerse, setLoadingVerse] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = observeUser(async (user) => {
-      setUser(user);
-      if (user) {
-        const favs = await getFavoriteHymns(user.uid);
-        setFavoriteHymnIds(favs);
-      } else {
-        setFavoriteHymnIds([]);
-      }
-    });
+    const unsubscribe = observeUser(setUser);
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    async function fetchHymns() {
-      const fetchedHymns = await getAllHymns();
-      setHymns(fetchedHymns);
+    async function fetchVerse() {
+      try {
+        setLoadingVerse(true);
+        const dailyVerse = await getVerseOfTheDay();
+        setVerse(dailyVerse);
+      } catch (error) {
+        console.error('Error fetching verse of the day:', error);
+        setVerse(null);
+      } finally {
+        setLoadingVerse(false);
+      }
     }
-    fetchHymns();
+    fetchVerse();
   }, []);
 
   const handleLogout = async () => {
     await signOutUser();
     router.push('/');
   };
-  
+
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     const names = name.split(' ');
@@ -61,7 +134,6 @@ export default function HomePage() {
     }
     return name.substring(0, 2).toUpperCase();
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -76,23 +148,33 @@ export default function HomePage() {
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 h-10 w-auto px-2">
-                 <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
-                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 h-10 w-auto px-2"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={user?.photoURL || undefined}
+                    alt={user?.displayName || 'User'}
+                  />
+                  <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
                 </Avatar>
                 {user && (
-                    <div className="text-left hidden md:flex flex-col">
-                        <span className="text-xs font-semibold leading-tight">{user.displayName || 'Usuário'}</span>
-                    </div>
+                  <div className="text-left hidden md:flex flex-col">
+                    <span className="text-xs font-semibold leading-tight">
+                      {user.displayName || 'Usuário'}
+                    </span>
+                  </div>
                 )}
-                 <span className="sr-only">Abrir menu do usuário</span>
+                <span className="sr-only">Abrir menu do usuário</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {user ? (
                 <>
-                  <DropdownMenuLabel>{user.displayName || 'Minha Conta'}</DropdownMenuLabel>
+                  <DropdownMenuLabel>
+                    {user.displayName || 'Minha Conta'}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -117,10 +199,9 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto">
-          <Suspense fallback={<p>Carregando hinos...</p>}>
-            <HymnList hymns={hymns} user={user} favoriteHymnIds={favoriteHymnIds} />
-          </Suspense>
+        <div className="max-w-4xl mx-auto space-y-8">
+          <VerseOfTheDayCard verse={verse} loading={loadingVerse} />
+          <NavigationButtons />
         </div>
       </main>
     </div>

@@ -15,7 +15,7 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
   return (
     <div className="min-h-screen bg-background text-foreground animate-fade-in">
       <header className="sticky top-0 z-10 flex items-center gap-4 px-4 sm:px-6 py-3 bg-background/80 backdrop-blur-sm border-b">
-        <Link href="/home" className="flex items-center gap-2 text-primary hover:underline font-semibold">
+        <Link href="/hymns" className="flex items-center gap-2 text-primary hover:underline font-semibold">
           <ArrowLeft className="h-5 w-5" />
           Voltar para a lista
         </Link>
