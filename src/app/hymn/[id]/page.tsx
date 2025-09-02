@@ -33,7 +33,7 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
               <CardContent className="p-4 sm:p-6">
                 <div className="whitespace-pre-wrap text-base sm:text-lg leading-relaxed sm:leading-loose space-y-1 font-body">
                   {hymn.lyrics.map((line, index) => (
-                    <p key={index} className={line.includes('[') ? 'font-bold mt-4' : ''}>
+                    <p key={index} className={line.startsWith('[') && line.endsWith(']') ? 'font-bold mt-4' : ''}>
                       {line || '\u00A0'}
                     </p>
                   ))}
@@ -44,7 +44,7 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
 
           <div className="lg:col-span-2 space-y-6">
             <HymnPlayer title="Cantado" audioUrl={hymn.audioUrl} />
-            <HymnPlayer title="Instrumental" audioUrl={hymn.instrumentalUrl} />
+            <HymnPlayer title="Instrumental" audioUrl={hymymn.instrumentalUrl} />
           </div>
         </div>
       </main>
