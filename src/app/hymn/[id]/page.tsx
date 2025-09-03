@@ -1,16 +1,21 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getHymnById } from '@/lib/hymns';
+import { getAllHymns } from '@/lib/hymns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import HymnPlayer from './_components/hymn-player';
 
 export default async function HymnDetailPage({ params }: { params: { id: string } }) {
-  const hymn = await getHymnById(params.id);
+  const hymns = await getAllHymns();
+  const currentIndex = hymns.findIndex(h => h.id === params.id);
 
-  if (!hymn) {
+  if (currentIndex === -1) {
     notFound();
   }
+
+  const hymn = hymns[currentIndex];
+  const previousHymnId = currentIndex > 0 ? hymns[currentIndex - 1].id : null;
+  const nextHymnId = currentIndex < hymns.length - 1 ? hymns[currentIndex + 1].id : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground animate-fade-in">
@@ -28,7 +33,12 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
         </div>
 
         <div className="mb-6 md:mb-8">
-           <HymnPlayer audioUrl={hymn.audioUrl} instrumentalUrl={hymn.instrumentalUrl} />
+           <HymnPlayer 
+             audioUrl={hymn.audioUrl} 
+             instrumentalUrl={hymn.instrumentalUrl}
+             previousHymnId={previousHymnId}
+             nextHymnId={nextHymnId}
+            />
         </div>
 
         <Card className="shadow-lg h-full">

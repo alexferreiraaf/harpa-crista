@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Music2, User } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
@@ -11,18 +12,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 interface PlayerProps {
     audioUrl: string;
     instrumentalUrl: string;
+    previousHymnId: string | null;
+    nextHymnId: string | null;
 }
 
-const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) => {
+const PlayerCore = ({ 
+    audioUrl, 
+    title,
+    previousHymnId,
+    nextHymnId
+}: { 
+    audioUrl: string, 
+    title: string,
+    previousHymnId: string | null,
+    nextHymnId: string | null 
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [canPlay, setCanPlay] = useState(false);
+  const router = useRouter();
+
 
   useEffect(() => {
     return () => {
-      // Cleanup: Pausa o áudio quando o componente é desmontado
       audioRef.current?.pause();
     };
   }, []);
@@ -32,7 +46,6 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
     if (audioRef.current) {
         if(audioUrl) {
             audioRef.current.src = audioUrl;
-            // Ouve o evento 'pause' de outras instâncias de áudio
             const handleOtherAudioPlay = (event: Event) => {
                 const target = event.target as HTMLAudioElement;
                 if (target !== audioRef.current) {
@@ -49,7 +62,6 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
             audioRef.current.load();
         }
     }
-    // Reset state when url changes
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
@@ -62,7 +74,6 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
         if (isPlaying) {
           audio.pause();
         } else {
-           // Emite um evento 'play' para que outros players possam pausar
           const playEvent = new Event('play', { bubbles: true });
           audio.dispatchEvent(playEvent);
           audio.play().catch(error => console.error("Playback failed:", error));
@@ -90,6 +101,14 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  const handleSkipBack = () => {
+    if(previousHymnId) router.push(`/hymn/${previousHymnId}`);
+  }
+
+  const handleSkipForward = () => {
+    if(nextHymnId) router.push(`/hymn/${nextHymnId}`);
   }
 
 
@@ -119,13 +138,13 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
             </div>
         </div>
         <div className="w-full flex items-center justify-center gap-4">
-             <Button variant="ghost" size="icon" className="text-muted-foreground" disabled>
+             <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={handleSkipBack} disabled={!previousHymnId}>
                 <SkipBack className="h-6 w-6" />
             </Button>
             <Button onClick={togglePlayPause} size="lg" className="rounded-full w-16 h-16 bg-primary hover:bg-primary/90 shadow-lg disabled:bg-muted" disabled={!canPlay}>
               {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
             </Button>
-            <Button variant="ghost" size="icon" className="text-muted-foreground" disabled>
+            <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={handleSkipForward} disabled={!nextHymnId}>
                 <SkipForward className="h-6 w-6" />
             </Button>
         </div>
@@ -139,7 +158,7 @@ const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) =>
 }
 
 
-export default function HymnPlayer({ audioUrl, instrumentalUrl }: PlayerProps) {
+export default function HymnPlayer({ audioUrl, instrumentalUrl, previousHymnId, nextHymnId }: PlayerProps) {
 
   return (
     <Card className="shadow-lg bg-card/80 backdrop-blur-sm">
@@ -155,10 +174,20 @@ export default function HymnPlayer({ audioUrl, instrumentalUrl }: PlayerProps) {
                 </TabsTrigger>
             </TabsList>
             <TabsContent value="sung">
-                <PlayerCore audioUrl={audioUrl} title="Cantado" />
+                <PlayerCore 
+                    audioUrl={audioUrl} 
+                    title="Cantado" 
+                    previousHymnId={previousHymnId}
+                    nextHymnId={nextHymnId}
+                />
             </TabsContent>
             <TabsContent value="instrumental">
-                <PlayerCore audioUrl={instrumentalUrl} title="Instrumental" />
+                <PlayerCore 
+                    audioUrl={instrumentalUrl} 
+                    title="Instrumental"
+                    previousHymnId={previousHymnId}
+                    nextHymnId={nextHymnId}
+                />
             </TabsContent>
         </Tabs>
     </Card>
