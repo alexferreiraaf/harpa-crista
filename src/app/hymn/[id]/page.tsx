@@ -21,32 +21,27 @@ export default async function HymnDetailPage({ params }: { params: { id: string 
         </Link>
       </header>
       
-      <main className="p-4 sm:p-6 max-w-6xl mx-auto">
+      <main className="p-4 sm:p-6 max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-headline font-bold mb-2">{hymn.title}</h1>
           <p className="text-md sm:text-lg text-muted-foreground">Hino Nº {hymn.number}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
-          <div className="lg:col-span-3">
-            <Card className="shadow-lg h-full">
-              <CardContent className="p-4 sm:p-6">
-                <div className="whitespace-pre-wrap text-base sm:text-lg leading-relaxed sm:leading-loose space-y-1 font-body">
-                  {hymn.lyrics.map((line, index) => (
-                    <p key={index} className={line.startsWith('[') && line.endsWith(']') ? 'font-bold mt-4' : ''}>
-                      {line || '\u00A0'}
-                    </p>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="lg:col-span-2 space-y-6">
-            <HymnPlayer title="Cantado" audioUrl={hymn.audioUrl} />
-            <HymnPlayer title="Instrumental" audioUrl={hymn.instrumentalUrl} />
-          </div>
+        <div className="mb-6 md:mb-8">
+           <HymnPlayer audioUrl={hymn.audioUrl} instrumentalUrl={hymn.instrumentalUrl} />
         </div>
+
+        <Card className="shadow-lg h-full">
+          <CardContent className="p-4 sm:p-6">
+            <div className="whitespace-pre-wrap text-base sm:text-lg leading-relaxed sm:leading-loose space-y-1 font-body">
+              {hymn.lyrics.map((line, index) => (
+                <p key={index} className={line.startsWith('[') && line.endsWith(']') ? 'font-bold mt-4' : ''}>
+                  {line || ' '}
+                </p>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

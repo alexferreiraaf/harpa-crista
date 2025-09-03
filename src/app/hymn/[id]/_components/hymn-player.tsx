@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Music2, User } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export default function HymnPlayer({ title, audioUrl }: { title: string, audioUrl: string }) {
+
+interface PlayerProps {
+    audioUrl: string;
+    instrumentalUrl: string;
+}
+
+const PlayerCore = ({ audioUrl, title }: { audioUrl: string, title: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -14,20 +21,29 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
   const [canPlay, setCanPlay] = useState(false);
 
   useEffect(() => {
-    const audio = audioRef.current;
     return () => {
-      if (audio) {
-        audio.pause();
-      }
+      // Cleanup: Pausa o áudio quando o componente é desmontado
+      audioRef.current?.pause();
     };
   }, []);
-  
+
   useEffect(() => {
     setCanPlay(!!audioUrl);
     if (audioRef.current) {
         if(audioUrl) {
             audioRef.current.src = audioUrl;
-            audioRef.current.load();
+            // Ouve o evento 'pause' de outras instâncias de áudio
+            const handleOtherAudioPlay = (event: Event) => {
+                const target = event.target as HTMLAudioElement;
+                if (target !== audioRef.current) {
+                    audioRef.current?.pause();
+                }
+            };
+            document.addEventListener('play', handleOtherAudioPlay, true);
+            
+            return () => {
+                document.removeEventListener('play', handleOtherAudioPlay, true);
+            }
         } else {
             audioRef.current.removeAttribute('src');
             audioRef.current.load();
@@ -37,7 +53,6 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
-
   }, [audioUrl]);
 
   const togglePlayPause = () => {
@@ -47,24 +62,20 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
         if (isPlaying) {
           audio.pause();
         } else {
-          // Pause all other audio elements on the page
-          document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== audio) {
-              otherAudio.pause();
-            }
-          });
+           // Emite um evento 'play' para que outros players possam pausar
+          const playEvent = new Event('play', { bubbles: true });
+          audio.dispatchEvent(playEvent);
           audio.play().catch(error => console.error("Playback failed:", error));
         }
-        // The onPlay/onPause events will handle setIsPlaying
     }
   };
-
+  
   const handleTimeUpdate = () => {
-    setCurrentTime(audioRef.current?.currentTime || 0);
+    if(audioRef.current) setCurrentTime(audioRef.current.currentTime);
   };
   
   const handleLoadedMetadata = () => {
-    setDuration(audioRef.current?.duration || 0);
+    if(audioRef.current) setDuration(audioRef.current.duration);
   }
 
   const handleSeek = (value: number[]) => {
@@ -81,12 +92,9 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  return (
-    <Card className="shadow-lg bg-card">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-4">
+
+ return (
+    <div className="p-4 space-y-4">
         <audio
           ref={audioRef}
           onTimeUpdate={handleTimeUpdate}
@@ -94,14 +102,9 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
           onEnded={() => setIsPlaying(false)}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
+          preload="metadata"
         />
-        <div className="w-full flex items-center justify-center gap-4">
-            <Button onClick={togglePlayPause} size="lg" className="rounded-full w-16 h-16 bg-primary hover:bg-primary/90 shadow-lg" disabled={!canPlay}>
-              {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
-            </Button>
-        </div>
-        <div className="w-full flex items-center gap-2 text-sm">
-            <span className="w-10 text-center tabular-nums text-muted-foreground">{formatTime(currentTime)}</span>
+        <div className="w-full space-y-1">
             <Slider
                 value={[currentTime]}
                 max={duration || 100}
@@ -110,14 +113,54 @@ export default function HymnPlayer({ title, audioUrl }: { title: string, audioUr
                 className="w-full"
                 disabled={!canPlay}
             />
-            <span className="w-10 text-center tabular-nums text-muted-foreground">{formatTime(duration)}</span>
+            <div className="flex justify-between text-xs text-muted-foreground">
+                <span className="w-10 text-left tabular-nums">{formatTime(currentTime)}</span>
+                <span className="w-10 text-right tabular-nums">{formatTime(duration)}</span>
+            </div>
+        </div>
+        <div className="w-full flex items-center justify-center gap-4">
+             <Button variant="ghost" size="icon" className="text-muted-foreground" disabled>
+                <SkipBack className="h-6 w-6" />
+            </Button>
+            <Button onClick={togglePlayPause} size="lg" className="rounded-full w-16 h-16 bg-primary hover:bg-primary/90 shadow-lg disabled:bg-muted" disabled={!canPlay}>
+              {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+            </Button>
+            <Button variant="ghost" size="icon" className="text-muted-foreground" disabled>
+                <SkipForward className="h-6 w-6" />
+            </Button>
         </div>
          {!canPlay && (
-          <p className="text-sm text-muted-foreground text-center mt-2">
-            Nenhum áudio disponível.
+          <p className="text-sm text-muted-foreground text-center pt-2">
+            Áudio não disponível.
           </p>
         )}
-      </CardContent>
+    </div>
+  );
+}
+
+
+export default function HymnPlayer({ audioUrl, instrumentalUrl }: PlayerProps) {
+
+  return (
+    <Card className="shadow-lg bg-card/80 backdrop-blur-sm">
+        <Tabs defaultValue="sung" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="sung" disabled={!audioUrl}>
+                    <User className="mr-2 h-4 w-4" />
+                    Cantado
+                </TabsTrigger>
+                <TabsTrigger value="instrumental" disabled={!instrumentalUrl}>
+                    <Music2 className="mr-2 h-4 w-4" />
+                    Instrumental
+                </TabsTrigger>
+            </TabsList>
+            <TabsContent value="sung">
+                <PlayerCore audioUrl={audioUrl} title="Cantado" />
+            </TabsContent>
+            <TabsContent value="instrumental">
+                <PlayerCore audioUrl={instrumentalUrl} title="Instrumental" />
+            </TabsContent>
+        </Tabs>
     </Card>
   );
 }
