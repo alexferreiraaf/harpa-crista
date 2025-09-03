@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleIcon, Logo } from "@/components/icons";
+import { GoogleIcon, ChurchLogo } from "@/components/icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -97,7 +97,7 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-background p-4 sm:p-6 md:p-8 animate-fade-in">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-6">
-          <Logo className="h-16 w-16 text-primary" />
+          <ChurchLogo className="h-24 w-24 text-primary" />
         </div>
         <Card className="shadow-2xl">
           <CardHeader className="text-center">

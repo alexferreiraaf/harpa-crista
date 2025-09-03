@@ -43,13 +43,35 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M17 18H7a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4Z" />
-      <path d="M7 18v-4" />
-      <path d="M9 14V6" />
-      <path d="M11 14V6" />
-      <path d="M13 14V6" />
-      <path d="M15 14V6" />
-      <path d="M17 14V6" />
+      <path d="M7 18a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h1a3 3 0 0 1 3 3v10a4 4 0 0 1-4 4Z" />
+      <path d="M12 18a4 4 0 0 0 4-4V6a4 4 0 0 0-4-4h-1a3 3 0 0 0-3 3v10a4 4 0 0 0 4 4Z" />
+    </svg>
+  );
+}
+
+export function ChurchLogo(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 150 150"
+      width="100"
+      height="100"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g className="stroke-primary fill-none" strokeWidth="2">
+        <path d="M60,95 L60,40 L90,25 L120,40 L120,95 L60,95 Z" />
+        <path d="M60,40 L30,55 L30,110 L60,95" />
+        <rect x="70" y="50" width="15" height="15" />
+        <rect x="95" y="50" width="15" height="15" />
+        <rect x="70" y="75" width="15" height="15" />
+        <rect x="95" y="75" width="15" height="15" />
+      </g>
+       <text y="125" x="75" textAnchor="middle" className="fill-primary font-serif" fontSize="8">
+        ASSEMBLEIA DE DEUS
+      </text>
+      <text y="135" x="75" textAnchor="middle" className="fill-primary font-serif" fontSize="8">
+        DE OURINHOS/SP
+      </text>
     </svg>
   );
 }
