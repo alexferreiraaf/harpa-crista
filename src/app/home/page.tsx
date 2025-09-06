@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -139,13 +140,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-3 bg-background/80 backdrop-blur-sm border-b">
-        <div className="flex items-center gap-2">
-          <Logo className="h-7 w-7 text-primary" />
-          <h1 className="text-xl font-bold font-headline text-foreground">
-            Harpa Cristã
-          </h1>
-        </div>
+      <header className="sticky top-0 z-10 flex items-center justify-end px-4 sm:px-6 py-3 bg-background/80 backdrop-blur-sm border-b">
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <DropdownMenu>
@@ -202,6 +197,12 @@ export default function HomePage() {
 
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto space-y-8">
+           <div className="flex flex-col items-center justify-center pt-4 pb-4 text-center">
+            <Logo className="h-24 w-24 text-primary mb-4" />
+            <h1 className="text-3xl sm:text-4xl font-bold font-headline text-foreground">
+              Harpa Cristã
+            </h1>
+          </div>
           {!verseError && <VerseOfTheDayCard verse={verse} loading={loadingVerse} />}
           <NavigationButtons />
         </div>
