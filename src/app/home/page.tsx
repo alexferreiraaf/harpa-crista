@@ -198,7 +198,7 @@ export default function HomePage() {
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-4xl mx-auto space-y-8">
            <div className="flex flex-col items-center justify-center pt-4 pb-4 text-center">
-            <Logo className="h-28 w-28 text-primary mb-4" />
+            <Logo className="h-32 w-32 text-primary mb-4" />
             <h1 className="text-3xl sm:text-4xl font-bold font-headline text-foreground">
               Harpa Cristã
             </h1>
